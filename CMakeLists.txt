@@ -1,90 +1,84 @@
-# Minimum CMake version required
 cmake_minimum_required(VERSION 3.15)
+project(Lua LANGUAGES C)
 
-# Project declaration
-project(lua_static
-        VERSION 5.4.6
-        DESCRIPTION "Lua Static Library"
-        LANGUAGES C
-)
+# Specify the Lua version (optional)
+set(LUA_VERSION "5.4.6" CACHE STRING "Lua version")
 
-# Specify the Lua source directory
-set(LUA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/lua")
-
-# Collect all Lua source files
+# List all Lua source files
 set(LUA_SOURCES
-        ${LUA_SRC_DIR}/lapi.c
-        ${LUA_SRC_DIR}/lcode.c
-        ${LUA_SRC_DIR}/lctype.c
-        ${LUA_SRC_DIR}/ldebug.c
-        ${LUA_SRC_DIR}/ldo.c
-        ${LUA_SRC_DIR}/ldump.c
-        ${LUA_SRC_DIR}/lfunc.c
-        ${LUA_SRC_DIR}/lgc.c
-        ${LUA_SRC_DIR}/llex.c
-        ${LUA_SRC_DIR}/lmem.c
-        ${LUA_SRC_DIR}/lobject.c
-        ${LUA_SRC_DIR}/lopcodes.c
-        ${LUA_SRC_DIR}/lparser.c
-        ${LUA_SRC_DIR}/lstate.c
-        ${LUA_SRC_DIR}/lstring.c
-        ${LUA_SRC_DIR}/ltable.c
-        ${LUA_SRC_DIR}/ltm.c
-        ${LUA_SRC_DIR}/lundump.c
-        ${LUA_SRC_DIR}/lvm.c
-        ${LUA_SRC_DIR}/lzio.c
-        ${LUA_SRC_DIR}/lauxlib.c
-        ${LUA_SRC_DIR}/lbaselib.c
-        ${LUA_SRC_DIR}/lcorolib.c
-        ${LUA_SRC_DIR}/ldblib.c
-        ${LUA_SRC_DIR}/liolib.c
-        ${LUA_SRC_DIR}/lmathlib.c
-        ${LUA_SRC_DIR}/loslib.c
-        ${LUA_SRC_DIR}/lstrlib.c
-        ${LUA_SRC_DIR}/ltablib.c
-        ${LUA_SRC_DIR}/loadlib.c
-        ${LUA_SRC_DIR}/linit.c
+        src/lua/lapi.c
+        src/lua/lcode.c
+        src/lua/lctype.c
+        src/lua/ldebug.c
+        src/lua/ldo.c
+        src/lua/ldump.c
+        src/lua/lfunc.c
+        src/lua/lgc.c
+        src/lua/llex.c
+        src/lua/lmem.c
+        src/lua/lobject.c
+        src/lua/lopcodes.c
+        src/lua/lparser.c
+        src/lua/lstate.c
+        src/lua/lstring.c
+        src/lua/ltable.c
+        src/lua/ltm.c
+        src/lua/lundump.c
+        src/lua/lvm.c
+        src/lua/lzio.c
+        src/lua/lauxlib.c
+        src/lua/lbaselib.c
+        src/lua/lcorolib.c
+        src/lua/ldblib.c
+        src/lua/liolib.c
+        src/lua/lmathlib.c
+        src/lua/loslib.c
+        src/lua/lstrlib.c
+        src/lua/ltablib.c
+        src/lua/loadlib.c
+        src/lua/linit.c
 )
 
-# Collect all Lua header files
+# List all Lua header files
 set(LUA_HEADERS
-        ${LUA_SRC_DIR}/lua.h
-        ${LUA_SRC_DIR}/lauxlib.h
-        ${LUA_SRC_DIR}/lualib.h
+        src/lua/lua.h
+        src/lua/lauxlib.h
+        src/lua/lualib.h
 )
 
-# Define the static library target
-add_library(lua_static STATIC ${LUA_SOURCES})
-
-# Set the C standard to C99
-set_target_properties(lua_static PROPERTIES
-        C_STANDARD 99
-        C_STANDARD_REQUIRED YES
-        C_EXTENSIONS NO
-        OUTPUT_NAME lua_static
+# Create a static library for Lua
+add_library(Lua STATIC
+        ${LUA_SOURCES}
 )
 
 # Specify include directories
-target_include_directories(lua_static PUBLIC
-        $<BUILD_INTERFACE:${LUA_SRC_DIR}>
-        $<INSTALL_INTERFACE:include/lua>
+target_include_directories(Lua PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:include>
+)
+
+# Set C standard to C99 (Lua is written in C)
+set_target_properties(Lua PROPERTIES
+        C_STANDARD 99
+        PUBLIC_HEADER "${LUA_HEADERS}"
 )
 
 # (Optional) Define any necessary compilation options or macros
 # For example, to define LUA_COMPAT_ALL if needed:
-# target_compile_definitions(lua_static PRIVATE LUA_COMPAT_ALL)
+# target_compile_definitions(Lua PRIVATE LUA_COMPAT_ALL)
 
-# Prevent Lua from building its own executable (optional)
-# If Lua's `lua.c` is present and you want to exclude it from the library,
-# make sure it's not listed in LUA_SOURCES.
+# Link libraries if necessary (Lua typically doesn't require additional libraries)
+# target_link_libraries(Lua PRIVATE )
 
-# Note: Since we're building a static library, there's no need to link against additional libraries.
+# Installation rules
+install(TARGETS Lua
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        PUBLIC_HEADER DESTINATION include/lua
+)
 
-# (Optional) Add compile options for better warnings and optimizations
-# Uncomment and modify as needed
-# target_compile_options(lua_static PRIVATE -Wall -Wextra -O2)
-
-# (Optional) Set position-independent code if required
-# set_target_properties(lua_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-# No install rules or export targets are defined to keep it simple
+install(DIRECTORY src/lua/
+        DESTINATION include/lua
+        FILES_MATCHING PATTERN "*.h"
+)
