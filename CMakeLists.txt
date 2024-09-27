@@ -1,14 +1,10 @@
-# CMakeLists.txt for Lua
-
 cmake_minimum_required(VERSION 3.15)
-project(Lua VERSION 5.4.7 LANGUAGES C)
+project(Lua LANGUAGES C)
 
-# Optionally, set Lua build options here
-option(LUA_BUILD_SHARED "Build Lua as a shared library" OFF)
-option(LUA_BUILD_BINARY "Build Lua executable and compiler" OFF)
-option(LUA_COMPAT_ALL "Enable all Lua compatibility features" OFF)
+# Specify the Lua version (optional)
+set(LUA_VERSION "5.4.6" CACHE STRING "Lua version")
 
-# Define the list of Lua source files located in src/lua/
+# List all Lua source files
 set(LUA_SOURCES
         src/lua/lapi.c
         src/lua/lcode.c
@@ -36,49 +32,53 @@ set(LUA_SOURCES
         src/lua/ldblib.c
         src/lua/liolib.c
         src/lua/lmathlib.c
-        src/lua/loadlib.c
         src/lua/loslib.c
         src/lua/lstrlib.c
         src/lua/ltablib.c
-        src/lua/lutf8lib.c
+        src/lua/loadlib.c
         src/lua/linit.c
 )
 
-# Create a static library
-add_library(lua_static STATIC ${LUA_SOURCES})
+# List all Lua header files
+set(LUA_HEADERS
+        src/lua/lua.h
+        src/lua/lauxlib.h
+        src/lua/lualib.h
+)
 
-# Define include directories using generator expressions
-target_include_directories(lua_static PUBLIC
+# Create a static library for Lua
+add_library(Lua STATIC
+        ${LUA_SOURCES}
+)
+
+# Specify include directories
+target_include_directories(Lua PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:include>
 )
 
-# Set compile definitions if compatibility is required
-if(LUA_COMPAT_ALL)
-    target_compile_definitions(lua_static PRIVATE LUA_COMPAT_ALL)
-endif()
-
-# Set library properties, mimicking the Kiero configuration
-set_target_properties(lua_static PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        PUBLIC_HEADER "src/lua/lapi.h;src/lua/lcode.h;src/lua/lctype.h;src/lua/ldebug.h;src/lua/ldo.h;src/lua/ldump.h;src/lua/lfunc.h;src/lua/lgc.h;src/lua/llex.h;src/lua/lmem.h;src/lua/lobject.h;src/lua/lopcodes.h;src/lua/lparser.h;src/lua/lstate.h;src/lua/lstring.h;src/lua/ltable.h;src/lua/ltm.h;src/lua/lundump.h;src/lua/lvm.h;src/lua/lzio.h;src/lua/lauxlib.h;src/lua/lbaselib.h;src/lua/lcorolib.h;src/lua/ldblib.h;src/lua/liolib.h;src/lua/lmathlib.h;src/lua/loadlib.h;src/lua/loslib.h;src/lua/lstrlib.h;src/lua/ltablib.h;src/lua/lutf8lib.h;src/lua/linit.h"
+# Set C standard to C99 (Lua is written in C)
+set_target_properties(Lua PROPERTIES
+        C_STANDARD 99
+        PUBLIC_HEADER "${LUA_HEADERS}"
 )
 
-# Add install commands similar to Kiero
-install(TARGETS lua_static
-        EXPORT LuaTargets
+# (Optional) Define any necessary compilation options or macros
+# For example, to define LUA_COMPAT_ALL if needed:
+# target_compile_definitions(Lua PRIVATE LUA_COMPAT_ALL)
+
+# Link libraries if necessary (Lua typically doesn't require additional libraries)
+# target_link_libraries(Lua PRIVATE )
+
+# Installation rules
+install(TARGETS Lua
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
         PUBLIC_HEADER DESTINATION include/lua
 )
 
-install(EXPORT LuaTargets
-        FILE LuaTargets.cmake
-        NAMESPACE Lua::
-        DESTINATION lib/cmake/Lua
-)
-
-install(DIRECTORY src/lua/ DESTINATION include/lua
+install(DIRECTORY src/lua/
+        DESTINATION include/lua
         FILES_MATCHING PATTERN "*.h"
 )
