@@ -62,9 +62,6 @@ endif()
 set_target_properties(lua_static PROPERTIES
         VERSION ${PROJECT_VERSION}
         PUBLIC_HEADER "src/lua/lapi.h;src/lua/lcode.h;src/lua/lctype.h;src/lua/ldebug.h;src/lua/ldo.h;src/lua/ldump.h;src/lua/lfunc.h;src/lua/lgc.h;src/lua/llex.h;src/lua/lmem.h;src/lua/lobject.h;src/lua/lopcodes.h;src/lua/lparser.h;src/lua/lstate.h;src/lua/lstring.h;src/lua/ltable.h;src/lua/ltm.h;src/lua/lundump.h;src/lua/lvm.h;src/lua/lzio.h;src/lua/lauxlib.h;src/lua/lbaselib.h;src/lua/lcorolib.h;src/lua/ldblib.h;src/lua/liolib.h;src/lua/lmathlib.h;src/lua/loadlib.h;src/lua/loslib.h;src/lua/lstrlib.h;src/lua/ltablib.h;src/lua/lutf8lib.h;src/lua/linit.h"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
 # Add install commands similar to Kiero
